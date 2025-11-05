@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Menú Semanal 3A</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(180deg, #f9fafb 0%, #e9ecef 100%);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    img.logo {
+      width: 120px;
+      margin-top: 10px;
+    }
+
+    h1 {
+      color: #333;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      max-width: 350px;
+      width: 100%;
+      text-align: center;
+      display: none;
+    }
+
+    button {
+      background-color: #004aad;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #003a86;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 12px;
+      font-size: 1rem;
+    }
+
+    .small {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 4px;
+      text-align: left;
+    }
+
+    #mainMenu {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    #successMsg {
+      color: green;
+      font-weight: 600;
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <img src="LOGO3A.png" alt="Logo 3A" class="logo">
+  <h1>Menú Semanal 3A</h1>
+
+  <!-- MENÚ PRINCIPAL -->
+  <div id="mainMenu">
+    <button id="adminBtn">Administrador</button>
+    <button id="empBtn">Empleado</button>
+  </div>
+
+  <!-- ADMIN CARD -->
+  <div id="adminCard" class="card">
+    <div class="small">Ingrese la contraseña del administrador</div>
+    <input id="adminPass" type="password" placeholder="Contraseña" />
+    <button id="adminLoginBtn">Ingresar</button>
+    <button onclick="goBack()">Regresar</button>
+  </div>
+
+  <!-- EMPLOYEE CARD -->
+  <div id="employeeCard" class="card">
+    <div class="small">Ingresa tu nombre</div>
+    <input id="empName" type="text" placeholder="Tu nombre" />
+
+    <div class="small">Selecciona el día</div>
+    <select id="daySelect">
+      <option value="">-- Selecciona un día --</option>
+    </select>
+
+    <div class="small">Selecciona bodega</div>
+    <select id="bodegaSelect">
+      <option value="B1">Bodega 1 (B1)</option>
+      <option value="B2">Bodega 2 (B2)</option>
+      <option value="B5">Bodega 5 (B5)</option>
+    </select>
+
+    <div id="foodArea" style="display:none;">
+      <div class="small">Platillo</div>
+      <select id="platilloSelect"></select>
+
+      <div class="small">Bebida</div>
+      <select id="bebidaSelect"></select>
+
+      <button id="confirmBtn">Confirmar selección</button>
+      <p id="successMsg">✅ Selección enviada correctamente</p>
+    </div>
+
+    <button onclick="goBack()">Regresar</button>
+  </div>
+
+  <script>
+    // 🚀 URL del backend (Node.js con Express)
+    const BACKEND_URL = "http://localhost:3000";  // <-- actualiza con tu dominio si lo cambias
+
+    const ADMIN_PASS = "RH3A2025";
+
+    const mainMenu = document.getElementById("mainMenu");
+    const adminCard = document.getElementById("adminCard");
+    const employeeCard = document.getElementById("employeeCard");
+
+    const daySelect = document.getElementById("daySelect");
+    const platilloSelect = document.getElementById("platilloSelect");
+    const bebidaSelect = document.getElementById("bebidaSelect");
+    const foodArea = document.getElementById("foodArea");
+    const successMsg = document.getElementById("successMsg");
+
+    // Mostrar secciones
+    document.getElementById("adminBtn").onclick = () => {
+      mainMenu.style.display = "none";
+      adminCard.style.display = "block";
+    };
+
+    document.getElementById("empBtn").onclick = () => {
+      mainMenu.style.display = "none";
+      employeeCard.style.display = "block";
+      cargarMenu();
+    };
+
+    function goBack() {
+      document.querySelectorAll('.card').forEach(c => c.style.display = "none");
+      mainMenu.style.display = "flex";
+    }
+
+    // LOGIN ADMIN
+    document.getElementById("adminLoginBtn").onclick = () => {
+      const pass = document.getElementById("adminPass").value.trim();
+      if (pass === ADMIN_PASS) {
+        alert("✅ Acceso concedido al panel de administrador");
+        // Aquí puedes agregar la redirección al panel admin si lo tienes
+      } else {
+        alert("❌ Contraseña incorrecta");
+      }
+    };
+
+    // CARGAR MENÚ DESDE EL BACKEND
+    async function cargarMenu() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/menu`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+
+        daySelect.innerHTML = '<option value="">-- Selecciona un día --</option>';
+        Object.keys(data.menu).forEach(dia => {
+          const opt = document.createElement("option");
+          opt.value = dia;
+          opt.textContent = dia;
+          daySelect.appendChild(opt);
+        });
+
+        daySelect.onchange = () => {
+          const diaSel = daySelect.value;
+          if (!diaSel) return foodArea.style.display = "none";
+
+          const menuDia = data.menu[diaSel];
+          platilloSelect.innerHTML = "";
+          bebidaSelect.innerHTML = "";
+
+          menuDia.platillos.forEach(p => {
+            const opt = document.createElement("option");
+            opt.textContent = p;
+            platilloSelect.appendChild(opt);
+          });
+
+          menuDia.bebidas.forEach(b => {
+            const opt = document.createElement("option");
+            opt.textContent = b;
+            bebidaSelect.appendChild(opt);
+          });
+
+          foodArea.style.display = "block";
+        };
+      } catch (err) {
+        alert("⚠️ Error al cargar el menú: " + err.message);
+      }
+    }
+
+    // CONFIRMAR SELECCIÓN
+    document.getElementById("confirmBtn").onclick = async () => {
+      const nombre = document.getElementById("empName").value.trim();
+      const bodega = document.getElementById("bodegaSelect").value;
+      const dia = document.getElementById("daySelect").value;
+      const platillo = platilloSelect.value;
+      const bebida = bebidaSelect.value;
+
+      if (!nombre || !dia || !platillo || !bebida) {
+        alert("Por favor completa todos los campos");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/seleccion`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nombre, bodega, dia, platillo, bebida })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          successMsg.style.display = "block";
+          setTimeout(() => successMsg.style.display = "none", 3000);
+        } else {
+          alert("Error: " + data.error);
+        }
+      } catch (err) {
+        alert("⚠️ Error de conexión: " + err.message);
+      }
+    };
+  </script>
+</body>
+</html>
