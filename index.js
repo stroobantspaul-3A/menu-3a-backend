@@ -7,7 +7,7 @@ app.use(cors());
 app.use(express.json());
 
 // 🔹 URL de tu App Script (cámbiala por la tuya si no es esta)
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzd7UAZc6Ipncm8SWXzYmYyj8iELQNhwFV6GabzK5lcYHln-UgbpZ-IAmixq_rTrMg_/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1jLuwSWGa1zmn3p7J8wi_jgEmPZnZ3Mubg2MJC55soHtEU7HLrxjq9ZWHUsOLQ1c6/exec";
 
 // ✅ Ruta para obtener el menú
 app.get("/menu", async (req, res) => {
