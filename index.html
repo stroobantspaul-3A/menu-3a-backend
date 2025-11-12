@@ -124,15 +124,18 @@
     </select>
 
     <div id="foodArea" style="display:none;">
-      <div class="small">Platillo</div>
-      <select id="platilloSelect"></select>
+  <div class="small">Platillo</div>
+  <select id="platilloSelect"></select>
 
-      <div class="small">Bebida</div>
-      <select id="bebidaSelect"></select>
+  <div class="small">Bebida</div>
+  <select id="bebidaSelect"></select>
 
-      <button id="confirmBtn">Confirmar selección</button>
-      <p id="successMsg">✅ Selección enviada correctamente</p>
-    </div>
+  <div class="small">Comentarios o indicaciones</div>
+  <textarea id="comentarios" rows="2" placeholder="Ejemplo: sin cebolla, extra salsa, etc."></textarea>
+
+  <button id="confirmBtn">Confirmar selección</button>
+  <p id="successMsg">✅ Selección enviada correctamente</p>
+</div>
 
     <button onclick="goBack()">Regresar</button>
   </div>
@@ -226,10 +229,11 @@
     // CONFIRMAR SELECCIÓN
     document.getElementById("confirmBtn").onclick = async () => {
       const nombre = document.getElementById("empName").value.trim();
-      const bodega = document.getElementById("bodegaSelect").value;
-      const dia = document.getElementById("daySelect").value;
-      const platillo = platilloSelect.value;
-      const bebida = bebidaSelect.value;
+const bodega = document.getElementById("bodegaSelect").value;
+const dia = document.getElementById("daySelect").value;
+const platillo = platilloSelect.value;
+const bebida = bebidaSelect.value;
+const comentarios = document.getElementById("comentarios").value.trim();
 
       if (!nombre || !dia || !platillo || !bebida) {
         alert("Por favor completa todos los campos");
@@ -240,7 +244,7 @@
         const res = await fetch(`${BACKEND_URL}/seleccion`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nombre, bodega, dia, platillo, bebida })
+          body: JSON.stringify({ nombre, bodega, dia, platillo, bebida, comentarios })
         });
 
         const data = await res.json();
